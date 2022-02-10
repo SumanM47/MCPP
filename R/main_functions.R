@@ -18,7 +18,7 @@ check_within_Window <- function(x,y,w){
     out <- as.vector((x <= xub & x >= xlb)*(y <= yub & y >= ylb))
   }
   if(w$type=="polygonal"){
-    require(sp)
+    #require(sp)
     polyx <- w$bdry[[1]]$x
     polyy <- w$bdry[[1]]$y
     #dimx <- dim(x)
@@ -153,7 +153,7 @@ NS_MCMC_new_fixp <- function(obj,parent_genus,offspring_genus,
   maxd <- sqrt((xmax-xmin)^2 + (ymax-ymin)^2)
   hclim = hclimp*maxd;
   hsd <- hclim/qnorm(0.995)
-  W_area <- area(W)
+  W_area <- spatstat.geom::area(W)
   
   ##Sorting out input
   

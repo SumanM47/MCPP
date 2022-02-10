@@ -27,7 +27,7 @@ multiprocppp <- function(win,
   if(length(hvec)!=1 & length(hvec)!=noff) stop("hvec must be a positive scalar or vector of length noff")
   if(sum(mu0vec<=0)!=0) stop("mu0vec must be positive")
   if(sum(hvec<=0)!=0) stop("hvec must be positive")
-  if(!is.owin(win)) stop("win must be object of class owin")
+  if(!spatstat.geom::is.owin(win)) stop("win must be object of class owin")
   if(nxtra < 0) stop("nxtra must be a non-negative integer")
   if(nxtra > 0 & missing(lambdaxtra)) stop("lambdaxtra is missing. Provide a positive scalar or vector of length nxtra")
   if(nxtra > 0 & (length(lambdaxtra)!=1 & length(lambdaxtra)!=nxtra))  stop("Provide a positive scalar or vector of length nxtra")
@@ -57,7 +57,7 @@ multiprocppp <- function(win,
   factortype <- factor(types, levels = types)
   
   ## First create the parent process
-  X <- rpoispp(lambdapar*(1-exp(-max(mu0vec))),win=win)
+  X <- spatstat.core::rpoispp(lambdapar*(1-exp(-max(mu0vec))),win=win)
   parentx <- X$x; parenty <- X$y; np <- X$n
   X <- X %mark% factortype[1]
   
@@ -78,24 +78,24 @@ multiprocppp <- function(win,
     xoff <- x0 + dx
     yoff <- y0 + dy
     
-    retain <- inside.owin(xoff,yoff,win)
+    retain <- spatstat.geom::inside.owin(xoff,yoff,win)
     
     xoff <- xoff[retain]
     yoff <- yoff[retain]
     
-    Y <- ppp(xoff,yoff,window=win)
+    Y <- spatstat.geom::ppp(xoff,yoff,window=win)
     
     Y <- Y %mark% factortype[1+i]
-    X <- superimpose(X, Y, W = X$window, check = FALSE)
+    X <- spatstat.geom::superimpose(X, Y, W = X$window, check = FALSE)
   }
   ## Generate from other processes, if any
   if(nxtra > 0){
     for(i in 1:nxtra){
-      Y <- rpoispp(lambdaxtra[i],lamx=NULL,
+      Y <- spatstat.core::rpoispp(lambdaxtra[i],lamx=NULL,
                    win=win,
                    nsim=1,drop=TRUE,ex=NULL,warnwin=TRUE)
       Y <- Y %mark% factortype[1+noff+i]
-      X <- superimpose(X, Y, W = X$window, check = FALSE)
+      X <- spatstat.geom::superimpose(X, Y, W = X$window, check = FALSE)
     }
   }
   
