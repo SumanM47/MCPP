@@ -94,7 +94,7 @@ multiprocppp <- function(win,
       Y <- spatstat.core::rpoispp(lambdaxtra[i],lamx=NULL,
                    win=win,
                    nsim=1,drop=TRUE,ex=NULL,warnwin=TRUE)
-      Y <- Y %mark% factortype[1+noff+i]
+      Y <- spatstat.geom::setmarks(Y,factortype[1+noff+i])
       X <- spatstat.geom::superimpose(X, Y, W = X$window, check = FALSE)
     }
   }
