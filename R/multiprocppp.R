@@ -11,7 +11,8 @@
 #' @param lambdaxtra scalar or vector of positive numbers, intensities of the unrelated entities processes
 #' @param  names_xtra scalar or vector of characters, names of the unrelated entities  
 #' 
-#' @import spatstat
+#' @import spatstat.geom
+#' @import spatstat.core
 #' 
 #' @return object of class ppp
 #' @export

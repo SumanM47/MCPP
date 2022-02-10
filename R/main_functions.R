@@ -6,6 +6,7 @@
 #' @param w owin class object, observation window
 #' 
 #' @importFrom sp point.in.polygon
+#' @import spatstat.geom
 #' 
 #' @return numeric vector of ones and zeros with
 #'  one meaning the point is within the window
@@ -107,7 +108,8 @@ subdata <- function(dat, genus){
 #' @param outfile path, path to the storage file where the periodical results are to be saved
 #' 
 #' @import fields
-#' @import spatstat
+#' @import spatstat.geom
+#' @import spatstat.core
 #' 
 #' @useDynLib MACPP gethsamp
 #' @useDynLib MACPP bignum2func
