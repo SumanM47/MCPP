@@ -59,7 +59,7 @@ multiprocppp <- function(win,
   ## First create the parent process
   X <- spatstat.core::rpoispp(lambdapar*(1-exp(-max(mu0vec))),win=win)
   parentx <- X$x; parenty <- X$y; np <- X$n
-  X <- X %mark% factortype[1]
+  X <- spatstat.geom::setmarks(X,factortype[1])
   
   ## Create the offspring process
   ## Specify parent locations in input for the lambda function
@@ -85,7 +85,7 @@ multiprocppp <- function(win,
     
     Y <- spatstat.geom::ppp(xoff,yoff,window=win)
     
-    Y <- Y %mark% factortype[1+i]
+    Y <- spatstat.geom::setmarks(Y,factortype[1+i])
     X <- spatstat.geom::superimpose(X, Y, W = X$window, check = FALSE)
   }
   ## Generate from other processes, if any
