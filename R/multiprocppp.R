@@ -1,4 +1,4 @@
-#' R function to generate from multiprocess poisson point process
+#' @title R function to generate from multiprocess poisson point process
 #'
 #' @param win owin class object, the observation window
 #' @param lambdapar positive scalar, the intensity paramter for the parent process
