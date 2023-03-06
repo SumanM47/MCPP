@@ -1,5 +1,4 @@
-#' Internal function to check if a set of points is
-#' within a given window
+#' @title Internal function to check if a set of points is within a given window
 #'
 #' @param x numeric vector, x coordinates of the points
 #' @param y numeric vector, y coordinates of the points
@@ -29,7 +28,7 @@ check_within_Window <- function(x,y,w){
 }
 
 
-#' Internal function to compute the sum of the log terms
+#' @title Internal function to compute the sum of the log terms
 #'
 #' @param Y_x numeric vector, x coordinates of the offspring process
 #' @param Y_y numeric vector, y coordinates of the offspring process
@@ -46,7 +45,7 @@ getbignum2 <- function(Y_x,Y_y,C_x,C_y,h){
   return(out)
 }
 
-#' Internal function to get initial values for the bandwidth parameters
+#' @title Internal function to get initial values for the bandwidth parameters
 #'
 #' @param Y_x numeric vector, x coordinates of the offspring process
 #' @param Y_y numeric vector, y coordinates of the offspring process
@@ -65,7 +64,7 @@ gethpars <- function(Y_x,Y_y,C_x,C_y){
 }
 
 
-#' Internal function to subset the data based on genus name
+#' @title Internal function to subset the data based on genus name
 #'
 #' @param dat ppp class object, the entire dataset
 #' @param genus character, name of the genus to be subsetted
@@ -85,7 +84,7 @@ subdata <- function(dat, genus){
 }
 
 
-#' R function to draw posterior samples from MCPP
+#' @title R function to draw posterior samples from MCPP
 #'
 #' @param obj ppp class object, the dataset
 #' @param parent_genus character vector, scalar if all parent types are same or a vector of name of the parent genuses
@@ -105,7 +104,7 @@ subdata <- function(dat, genus){
 #' @useDynLib MCPP gethsamp
 #' @useDynLib MCPP bignum2func
 #'
-#' @return list of posterior samples for the corresponding parameters
+#' @return list of posterior samples for the corresponding parameters, object of class MCPP
 #'
 #' @export
 
@@ -337,6 +336,14 @@ MCPP_run <- function(obj,parent_genus,offspring_genus,
 
   }
   if(nxt==0){keep.lambdaO <- NULL}
-  lst <- list("lambdaC"=keep.lambdaC,"mu0"=keep.mu0,"h"=keep.h,"lambdaO"=keep.lambdaO)
+  setup <- list()
+  setup$nreps <- iters
+  setup$burn <- burn
+  setup$thin <- thin
+  setup$popair <- cbind(parent_genus,offspring_genus)
+  setup$others <- NULL
+  if(nxt>0){setup$others <- xtra_genus}
+  lst <- list("lambdaC"=keep.lambdaC,"mu0"=keep.mu0,"h"=keep.h,"lambdaO"=keep.lambdaO,"setup" <- setup)
+  class(lst) <- "MCPP"
   return(lst)
 }
