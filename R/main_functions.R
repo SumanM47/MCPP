@@ -28,7 +28,7 @@ check_within_Window <- function(x,y,w){
 }
 
 
-#' @title Internal function to compute the sum of the log terms
+#' @title Internal function to compute the sum of the log terms for Gaussian kernel
 #'
 #' @param Y_x numeric vector, x coordinates of the offspring process
 #' @param Y_y numeric vector, y coordinates of the offspring process
@@ -36,12 +36,46 @@ check_within_Window <- function(x,y,w){
 #' @param C_y numeric vector, y coordinates of the parent process
 #' @param h positive scalar, bandwidth
 #'
-#' @useDynLib MCPP bignum2func
+#' @useDynLib MCPP bignum2func_norm
 #'
 #' @return real scalar
 
-getbignum2 <- function(Y_x,Y_y,C_x,C_y,h){
-  out <-  .Call("bignum2func",as.numeric(Y_x),as.numeric(Y_y),as.numeric(C_x),as.numeric(C_y),as.numeric(h))
+getbignum2.norm <- function(Y_x,Y_y,C_x,C_y,h){
+  out <-  .Call("bignum2func_norm",as.numeric(Y_x),as.numeric(Y_y),as.numeric(C_x),as.numeric(C_y),as.numeric(h))
+  return(out)
+}
+
+#' @title Internal function to compute the sum of the log terms for Cauchy kernel
+#'
+#' @param Y_x numeric vector, x coordinates of the offspring process
+#' @param Y_y numeric vector, y coordinates of the offspring process
+#' @param C_x numeric vector, x coordinates of the parent process
+#' @param C_y numeric vector, y coordinates of the parent process
+#' @param h positive scalar, bandwidth
+#'
+#' @useDynLib MCPP bignum2func_cauchy
+#'
+#' @return real scalar
+
+getbignum2.cauchy <- function(Y_x,Y_y,C_x,C_y,h){
+  out <-  .Call("bignum2func_cauchy",as.numeric(Y_x),as.numeric(Y_y),as.numeric(C_x),as.numeric(C_y),as.numeric(h))
+  return(out)
+}
+
+#' @title Internal function to compute the sum of the log terms for Uniform Kernel
+#'
+#' @param Y_x numeric vector, x coordinates of the offspring process
+#' @param Y_y numeric vector, y coordinates of the offspring process
+#' @param C_x numeric vector, x coordinates of the parent process
+#' @param C_y numeric vector, y coordinates of the parent process
+#' @param h positive scalar, bandwidth
+#'
+#' @useDynLib MCPP bignum2func_unif
+#'
+#' @return real scalar
+
+getbignum2.unif <- function(Y_x,Y_y,C_x,C_y,h){
+  out <-  .Call("bignum2func_unif",as.numeric(Y_x),as.numeric(Y_y),as.numeric(C_x),as.numeric(C_y),as.numeric(h))
   return(out)
 }
 
@@ -83,6 +117,60 @@ subdata <- function(dat, genus){
   return(dd)
 }
 
+#' @title Internal function for generating from a Gaussian kernel
+#'
+#' @param B positive integer, number of samples to draw for each parent location
+#' @param Cx real vector, x coordinates of the centers
+#' @param Cy real vector, y coordinates of the centers
+#' @param h positive real scalar, bandwidth parameter
+#'
+#' @return list with two matrices for the x and y coordinates of the generated points
+
+rkern.norm <- function(B,Cx,Cy,h){
+  nCs <- length(Cx)
+  Bx <- Cx + h*matrix(rnorm(nCs*B),nCs,B)
+  By <- Cy + h*matrix(rnorm(nCs*B),nCs,B)
+  out <- list("Bx"=Bx,"By"=By)
+  retrun(out)
+}
+
+#' @title Internal function for generating from a Cauchy kernel
+#'
+#' @param B positive integer, number of samples to draw for each parent location
+#' @param Cx real vector, x coordinates of the centers
+#' @param Cy real vector, y coordinates of the centers
+#' @param h positive real scalar, bandwidth parameter
+#'
+#' @return list with two matrices for the x and y coordinates of the generated points
+
+rkern.cauchy <- function(B,Cx,Cy,h){
+  nCs <- length(Cx)
+  Z <- sqrt(matrix(rchisq(nCs*B),nCs,B))
+  Bx <- Cx + (h/Z)*matrix(rnorm(nCS*B),nCs,B)
+  By <- Cy + (h/Z)*matrix(rnorm(nCS*B),nCs,B)
+  out <- list("Bx"=Bx,"By"=By)
+  retrun(out)
+}
+
+#' @title Internal function for generating from a Uniform kernel
+#'
+#' @param B positive integer, number of samples to draw for each parent location
+#' @param Cx real vector, x coordinates of the centers
+#' @param Cy real vector, y coordinates of the centers
+#' @param h positive real scalar, bandwidth parameter
+#'
+#' @return list with two matrices for the x and y coordinates of the generated points
+
+rkern.unif <- function(B,Cx,Cy,h){
+  nCs <- length(Cx)
+  R <- h*matrix(runif(nCs*B),nCs,B)
+  theta <- 2*pi*matrix(runif(nCs*B),nCs,B)
+  Bx <- Cx + R*cos(theta)
+  By <- Cy + R*sin(theta)
+  out <- list("Bx"=Bx,"By"=By)
+  retrun(out)
+}
+
 
 #' @title R function to draw posterior samples from MCPP
 #'
@@ -91,6 +179,7 @@ subdata <- function(dat, genus){
 #' @param offspring_genus character vector, name of the offspring genuses
 #' @param bdtype numeric scalar, can take values 1 or 2. 1 keeps the window as is; 2 creates a convex hull and uses that as the window
 #' @param B positive integer, number of Monte Carlo samples to use to approximate the integral term
+#' @param kern character, choice of kernel function. Permitted values are "Gaussian", "Uniform" or "Cauchy"
 #' @param jitter logical, if TRUE, the initial value for the bandwidth parameter is jittered. Useful for running multiple chains
 #' @param hyperParams named list of hyperparameters needed for the MCPP model, components are, lambda (two-vector of shape and rate hyperparamaters for the Gamma prior to the parent intensities), alpha (two-vector of shape and rate hyperparamaters for the Gamma prior to the alpha parameter of the offspring densities), lambdaO (two-vector of shape and rate hyperparamaters for the Gamma prior to the unrelated taxa intensities), h (scalar proportion of the maximum window distance to be set equal to the 99th percentile of the Half-normal prior to the bandwidth parameter)
 #' @param startValues named list of starting values for the alpha and h parameters, components are, alpha (positive vector of initial values for the alpha parameter, same size as the number of offspring taxa) and h (positive vector of initial values for the bandwidth parameter, same size as the number of offspring taxa). Default is NULL in which case initial values are computed
@@ -102,7 +191,9 @@ subdata <- function(dat, genus){
 #' @import sp
 #'
 #' @useDynLib MCPP gethsamp
-#' @useDynLib MCPP bignum2func
+#' @useDynLib MCPP bignum2func_norm
+#' @useDynLib MCPP bignum2func_cauchy
+#' @useDynLib MCPP bignum2func_unif
 #'
 #' @return list of posterior samples for the corresponding parameters, object of class MCPP
 #'
@@ -110,6 +201,7 @@ subdata <- function(dat, genus){
 
 MCPP_run <- function(obj,parent_genus,offspring_genus,
                              bdtype=1,B=100,
+                             kern = "Gaussian",
                              jitter=FALSE,
                              hyperParams=list("lambda"=c(0.01,0.01),
                                               "alpha"=c(0.01,0.01),
@@ -133,6 +225,20 @@ MCPP_run <- function(obj,parent_genus,offspring_genus,
     cvxhull <- rev(chull(obj$x,obj$y))
     wcvx <- owin(poly=list(x=obj$x[cvxhull],y=obj$y[cvxhull]))
     obj$window <- wcvx
+  }
+
+  if(!(kern %in% c("Gaussian","Cauchy","Uniform"))){stop("Only Gaussian, Uniform and Cauchy kernels are supported")}
+  if(kern == "Gaussian"){
+    getbignum2 <- getbignum2.norm
+    rkern <- rkern.norm
+  }
+  if(kern == "Cauchy"){
+    getbignum2 <- getbignum2.cauchy
+    rkern <- rkern.cauchy
+  }
+  if(kern == "Uniform"){
+    getbignum2 <- getbignum2.unif
+    rkern <- rkern.unif
   }
 
   ## Parse hyperParam Inputs
@@ -223,7 +329,8 @@ MCPP_run <- function(obj,parent_genus,offspring_genus,
       hs <- jitter(hs)
     }
     hvec[ind] <- hs
-    Bigmat_x <- C_x + hs*matrix(rnorm(n_Cs*B),n_Cs,B); Bigmat_y <- C_y + hs*matrix(rnorm(n_Cs*B),n_Cs,B)
+    lll <- rkern(B,C_x,C_y,hs)
+    Bigmat_x <- lll$Bx; Bigmat_y <- lll$By
     Bignum1vec[ind] <- sum(check_within_Window(Bigmat_x,Bigmat_y,W))/B
 
     Bignum2vec[ind] <- getbignum2(Y_x,Y_y,C_x,C_y,hs)
@@ -285,7 +392,8 @@ MCPP_run <- function(obj,parent_genus,offspring_genus,
 
       if(can_hs > 0){
         pratio <- -0.5*((can_hs/hsd)^2 - (hs/hsd)^2)
-        Bigmat_x <- C_x + can_hs*matrix(rnorm(n_Cs*B),n_Cs,B); Bigmat_y <- C_y + can_hs*matrix(rnorm(n_Cs*B),n_Cs,B)
+        can_lll <- rkern(B,C_x,C_y,can_hs)
+        Bigmat_x <- can_lll$Bx; Bigmat_y <- can_lll$By
         can_Bignum1 <- sum(check_within_Window(Bigmat_x,Bigmat_y,W))/B
 
         can_Bignum2 <- getbignum2(Y_x,Y_y,C_x,C_y,can_hs)

@@ -9,8 +9,8 @@
 
 
 
-SEXP bignum2func(SEXP yx, SEXP yy, SEXP cx, SEXP cy, SEXP h){
-	
+SEXP bignum2func_norm(SEXP yx, SEXP yy, SEXP cx, SEXP cy, SEXP h){
+
 	int nC = length(cx);
 	int nY = length(yy);
 	double hh = asReal(h);
@@ -31,7 +31,7 @@ SEXP bignum2func(SEXP yx, SEXP yy, SEXP cx, SEXP cy, SEXP h){
 		t2 = pyy[i];
 		for(int j=0; j<nC; j++){
 			temp1= t1 - pcx[j];
-			temp2= t2 - pcy[j];	
+			temp2= t2 - pcy[j];
 			bignum += exp(-(temp1*temp1 + temp2*temp2)/(h2));
 		}
 		bignum2 += log(bignum);
@@ -47,6 +47,80 @@ SEXP bignum2func(SEXP yx, SEXP yy, SEXP cx, SEXP cy, SEXP h){
 	return out;
 }
 
+SEXP bignum2func_cauchy(SEXP yx, SEXP yy, SEXP cx, SEXP cy, SEXP h){
+
+  int nC = length(cx);
+  int nY = length(yy);
+  double hh = asReal(h);
+
+  double *pyx, *pyy, *pcx, *pcy;
+  pyx = REAL(yx);
+  pyy = REAL(yy);
+  pcx = REAL(cx);
+  pcy = REAL(cy);
+  double bignum = 0;
+  double bignum2 = 0;
+  double temp1, temp2, t1, t2;
+  double h2 = hh*hh;
+  double h3 = -nY*log((2*M_PI*h2));
+
+  for(int i=0; i<nY; i++){
+    t1 = pyx[i];
+    t2 = pyy[i];
+    for(int j=0; j<nC; j++){
+      temp1= t1 - pcx[j];
+      temp2= t2 - pcy[j];
+      bignum += 1.0/pow(1+((temp1*temp1 + temp2*temp2)/(h2)),1.5);
+    }
+    bignum2 += log(bignum);
+    bignum = 0;
+
+  }
+  bignum2 = h3+bignum2;
+
+  SEXP out = PROTECT(allocVector(REALSXP,1));
+  REAL(out)[0] = bignum2;
+  UNPROTECT(1);
+
+  return out;
+}
+
+SEXP bignum2func_unif(SEXP yx, SEXP yy, SEXP cx, SEXP cy, SEXP h){
+
+  int nC = length(cx);
+  int nY = length(yy);
+  double hh = asReal(h);
+
+  double *pyx, *pyy, *pcx, *pcy;
+  pyx = REAL(yx);
+  pyy = REAL(yy);
+  pcx = REAL(cx);
+  pcy = REAL(cy);
+  double bignum = 0;
+  double bignum2 = 0;
+  double temp1, temp2, t1, t2, d;
+  double h2 = hh*hh;
+
+  for(int i=0; i<nY; i++){
+    t1 = pyx[i];
+    t2 = pyy[i];
+    for(int j=0; j<nC; j++){
+      temp1= t1 - pcx[j];
+      temp2= t2 - pcy[j];
+      d = temp1*temp1 + temp2*temp2;
+      bignum += (d <= h2) ? 1.0/(M_PI*h2): 0;
+    }
+    bignum2 += log(bignum);
+    bignum = 0;
+
+  }
+
+  SEXP out = PROTECT(allocVector(REALSXP,1));
+  REAL(out)[0] = bignum2;
+  UNPROTECT(1);
+
+  return out;
+}
 
 
 SEXP gethsamp(SEXP yx, SEXP yy, SEXP cx, SEXP cy){
@@ -78,7 +152,7 @@ SEXP gethsamp(SEXP yx, SEXP yy, SEXP cx, SEXP cy){
 
 		pout[i] = sqrt(temp);
 		temp = LONG_MAX;
-		
+
 	}
 
 	UNPROTECT(1);
