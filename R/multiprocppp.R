@@ -1,3 +1,4 @@
+#' @name multiprocppp
 #' @title R function to generate from multiprocess poisson point process
 #'
 #' @param win owin class object, the observation window
@@ -13,6 +14,8 @@
 #'
 #' @import spatstat.geom
 #' @import spatstat.random
+#' @import stats
+#' @import grDevices
 #'
 #' @return object of class ppp
 #' @export

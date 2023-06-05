@@ -1,3 +1,4 @@
+#' @name check_within_window
 #' @title Internal function to check if a set of points is within a given window
 #'
 #' @param x numeric vector, x coordinates of the points
@@ -9,6 +10,7 @@
 #'
 #' @return numeric vector of ones and zeros with
 #'  one meaning the point is within the window
+#' @noRd
 
 check_within_Window <- function(x,y,w){
   if(w$type == "rectangle"){
@@ -28,6 +30,7 @@ check_within_Window <- function(x,y,w){
 }
 
 
+#' @name getbignum2.norm
 #' @title Internal function to compute the sum of the log terms for Gaussian kernel
 #'
 #' @param Y_x numeric vector, x coordinates of the offspring process
@@ -36,15 +39,17 @@ check_within_Window <- function(x,y,w){
 #' @param C_y numeric vector, y coordinates of the parent process
 #' @param h positive scalar, bandwidth
 #'
-#' @useDynLib MCPP bignum2func_norm
+#' @useDynLib MCPP, .registration=TRUE
 #'
 #' @return real scalar
+#' @noRd
 
 getbignum2.norm <- function(Y_x,Y_y,C_x,C_y,h){
   out <-  .Call("bignum2func_norm",as.numeric(Y_x),as.numeric(Y_y),as.numeric(C_x),as.numeric(C_y),as.numeric(h))
   return(out)
 }
 
+#' @name getbignum2.cauchy
 #' @title Internal function to compute the sum of the log terms for Cauchy kernel
 #'
 #' @param Y_x numeric vector, x coordinates of the offspring process
@@ -53,15 +58,17 @@ getbignum2.norm <- function(Y_x,Y_y,C_x,C_y,h){
 #' @param C_y numeric vector, y coordinates of the parent process
 #' @param h positive scalar, bandwidth
 #'
-#' @useDynLib MCPP bignum2func_cauchy
+#' @useDynLib MCPP, .registration=TRUE
 #'
 #' @return real scalar
+#' @noRd
 
 getbignum2.cauchy <- function(Y_x,Y_y,C_x,C_y,h){
   out <-  .Call("bignum2func_cauchy",as.numeric(Y_x),as.numeric(Y_y),as.numeric(C_x),as.numeric(C_y),as.numeric(h))
   return(out)
 }
 
+#' @name getbignum2.unif
 #' @title Internal function to compute the sum of the log terms for Uniform Kernel
 #'
 #' @param Y_x numeric vector, x coordinates of the offspring process
@@ -70,15 +77,17 @@ getbignum2.cauchy <- function(Y_x,Y_y,C_x,C_y,h){
 #' @param C_y numeric vector, y coordinates of the parent process
 #' @param h positive scalar, bandwidth
 #'
-#' @useDynLib MCPP bignum2func_unif
+#' @useDynLib MCPP, .registration=TRUE
 #'
 #' @return real scalar
+#' @noRd
 
 getbignum2.unif <- function(Y_x,Y_y,C_x,C_y,h){
   out <-  .Call("bignum2func_unif",as.numeric(Y_x),as.numeric(Y_y),as.numeric(C_x),as.numeric(C_y),as.numeric(h))
   return(out)
 }
 
+#' @name gethpars
 #' @title Internal function to get initial values for the bandwidth parameters
 #'
 #' @param Y_x numeric vector, x coordinates of the offspring process
@@ -86,9 +95,10 @@ getbignum2.unif <- function(Y_x,Y_y,C_x,C_y,h){
 #' @param C_x numeric vector, x coordinates of the parent process
 #' @param C_y numeric vector, y coordinates of the parent process
 #'
-#' @useDynLib MCPP gethsamp
+#' @useDynLib MCPP, .registration=TRUE
 #'
 #' @return positive scalar for initial value of h
+#' @noRd
 
 gethpars <- function(Y_x,Y_y,C_x,C_y){
   hsamp <- .Call("gethsamp",as.numeric(Y_x),as.numeric(Y_y),as.numeric(C_x),as.numeric(C_y))
@@ -98,12 +108,14 @@ gethpars <- function(Y_x,Y_y,C_x,C_y){
 }
 
 
+#' @name subdata
 #' @title Internal function to subset the data based on genus name
 #'
 #' @param dat ppp class object, the entire dataset
 #' @param genus character, name of the genus to be subsetted
 #'
 #' @return ppp class object, subset of the data with only the specified genus
+#' @noRd
 
 subdata <- function(dat, genus){
   dd <- dat
@@ -117,6 +129,7 @@ subdata <- function(dat, genus){
   return(dd)
 }
 
+#' @name rkern.norm
 #' @title Internal function for generating from a Gaussian kernel
 #'
 #' @param B positive integer, number of samples to draw for each parent location
@@ -124,7 +137,9 @@ subdata <- function(dat, genus){
 #' @param Cy real vector, y coordinates of the centers
 #' @param h positive real scalar, bandwidth parameter
 #'
+#' @import stats
 #' @return list with two matrices for the x and y coordinates of the generated points
+#' @noRd
 
 rkern.norm <- function(B,Cx,Cy,h){
   nCs <- length(Cx)
@@ -134,6 +149,7 @@ rkern.norm <- function(B,Cx,Cy,h){
   retrun(out)
 }
 
+#' @name rkern.cauchy
 #' @title Internal function for generating from a Cauchy kernel
 #'
 #' @param B positive integer, number of samples to draw for each parent location
@@ -141,7 +157,9 @@ rkern.norm <- function(B,Cx,Cy,h){
 #' @param Cy real vector, y coordinates of the centers
 #' @param h positive real scalar, bandwidth parameter
 #'
+#' @import stats
 #' @return list with two matrices for the x and y coordinates of the generated points
+#' @noRd
 
 rkern.cauchy <- function(B,Cx,Cy,h){
   nCs <- length(Cx)
@@ -152,6 +170,7 @@ rkern.cauchy <- function(B,Cx,Cy,h){
   retrun(out)
 }
 
+#' @name rkern.unif
 #' @title Internal function for generating from a Uniform kernel
 #'
 #' @param B positive integer, number of samples to draw for each parent location
@@ -159,7 +178,9 @@ rkern.cauchy <- function(B,Cx,Cy,h){
 #' @param Cy real vector, y coordinates of the centers
 #' @param h positive real scalar, bandwidth parameter
 #'
+#' @import stats
 #' @return list with two matrices for the x and y coordinates of the generated points
+#' @noRd
 
 rkern.unif <- function(B,Cx,Cy,h){
   nCs <- length(Cx)
@@ -171,8 +192,27 @@ rkern.unif <- function(B,Cx,Cy,h){
   retrun(out)
 }
 
-
-#' @title R function to draw posterior samples from MCPP
+#' @title Draw posterior samples from MCPP
+#'
+#' @description
+#' Generates posterior samples from MCPP model from a ppp class object
+#'
+#' @usage MCPP_run(obj,parent_genus,offspring_genus,
+#' bdtype=1,B=100,
+#' kern = "Gaussian",
+#' jitter=FALSE,
+#' hyperParams=list("lambda"=c(0.01,0.01),
+#'                  "alpha"=c(0.01,0.01),
+#'                  "lambdaO"=c(0.01,0.01),
+#'                  "h"=0.05),
+#' startValues=NULL,
+#' mcmcParams=list("run"=list(numReps=20000,
+#'                            thin=1,
+#'                            burninPerc=0.5),
+#'                 "storage"=NULL,
+#'                 "tuning"=NULL),
+#' store_res=FALSE,path=NULL)
+#'
 #'
 #' @param obj ppp class object, the dataset
 #' @param parent_genus character vector, scalar if all parent types are same or a vector of name of the parent genuses
@@ -189,11 +229,10 @@ rkern.unif <- function(B,Cx,Cy,h){
 #'
 #' @import spatstat.geom
 #' @import sp
+#' @import stats
+#' @import grDevices
 #'
-#' @useDynLib MCPP gethsamp
-#' @useDynLib MCPP bignum2func_norm
-#' @useDynLib MCPP bignum2func_cauchy
-#' @useDynLib MCPP bignum2func_unif
+#' @useDynLib MCPP, .registration=TRUE
 #'
 #' @return list of posterior samples for the corresponding parameters, object of class MCPP
 #'
@@ -359,7 +398,7 @@ MCPP_run <- function(obj,parent_genus,offspring_genus,
     store.h <- store.mu0 <- store.lambdaC <- store.lambdaO <- NULL
   }
 
-  pratio <- xtra_ep <- 0
+  pratio <- xtra_ep <- dbar <- dtheta <- 0
 
   ## GO!
   for(i in 1:iters){
@@ -416,8 +455,10 @@ MCPP_run <- function(obj,parent_genus,offspring_genus,
       keep.lambdaC[index,] <- lambdaC
       keep.mu0[index,] <- mu0vec
       keep.h[index,] <- hvec
+      dbar <- dbar + 2*sum((W_area + bl)*lambdaC - (al + n_Cpart[upnoid])*log(lambdaC)) + 2*sum((bm+Bignum1vec)*mu0vec - (am+n_Ypart)*log(mu0vec)) -2*sum(Bignum2vec)
       if(nxt > 0){
         keep.lambdaO[index,] <- lambdaO
+        dbar <- dbar + 2*sum((W_area + bo)*lambdaO - (ao + n_Opart)*log(lambdaO))
       }
     }
     if(store_res){
@@ -443,6 +484,22 @@ MCPP_run <- function(obj,parent_genus,offspring_genus,
     }
 
   }
+  dbar <- dbar/((iters-burn)/thin)
+  barlambdaC <- colMeans(keep.lambdaC)
+  barmu0 <- colMeans(keep.mu0)
+  barh <- colMeans(keep.h)
+  barBignum1vec <- barBignum2vec <- rep(NA,not)
+  for(j in 1:not){
+    Y_x <- Ypart_x[[j]]; Y_y <- Ypart_y[[j]]; n_Ys <- n_Ypart[j]
+    C_x <- Cpart_x[[j]]; C_y <- Cpart_y[[j]]; n_Cs <- n_Cpart[j]
+    barhs <- barh[j]
+    barlll <- rkern(B,C_x,C_y,barhs)
+    Bigmat_x <- barlll$Bx; Bigmat_y <- barlll$By
+    barBignum1vec[j] <- sum(check_within_Window(Bigmat_x,Bigmat_y,W))/B
+
+    barBignum2vec[j] <- getbignum2(Y_x,Y_y,C_x,C_y,barhs)
+  }
+  dtheta <- 2*sum((W_area + bl)*barlambdaC - (al + n_Cpart[upnoid])*log(barlambdaC)) + 2*sum((bm+barBignum1vec)*barmu0vec - (am+n_Ypart)*log(barmu0vec)) -2*sum(barBignum2vec)
   if(nxt==0){keep.lambdaO <- NULL}
   setup <- list()
   setup$nreps <- iters
@@ -450,8 +507,9 @@ MCPP_run <- function(obj,parent_genus,offspring_genus,
   setup$thin <- thin
   setup$popair <- cbind(parent_genus,offspring_genus)
   setup$others <- NULL
-  if(nxt>0){setup$others <- xtra_genus}
-  lst <- list("lambdaC"=keep.lambdaC,"mu0"=keep.mu0,"h"=keep.h,"lambdaO"=keep.lambdaO,"setup" <- setup)
+  if(nxt>0){setup$others <- xtra_genus; barlambdO <- colMeans(keep.lambdaO); dtheta <- dtheta + 2*sum((W_area + bo)*barlambdaO - (ao + n_Opart)*log(barlambdaO))}
+  DIC <- 2*dbar - dtheta
+  lst <- list("lambdaC"=keep.lambdaC,"mu0"=keep.mu0,"h"=keep.h,"lambdaO"=keep.lambdaO,"setup" = setup, "DIC" = DIC)
   class(lst) <- "MCPP"
   return(lst)
 }
