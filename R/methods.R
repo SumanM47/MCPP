@@ -1,7 +1,3 @@
-rm(list=ls())
-
-
-
 ## PRINT METHOD
 
 #' @title Print function for MCPP class objects

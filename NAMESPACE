@@ -2,7 +2,7 @@
 
 S3method(print,MCPP)
 S3method(print,summ.MCPP)
-export()
+export(fitMCPP)
 export(multiprocppp)
 import(grDevices)
 import(sp)
