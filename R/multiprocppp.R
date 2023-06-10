@@ -2,11 +2,12 @@
 #' @title R function to generate from multiprocess poisson point process
 #'
 #' @param win owin class object, the observation window
-#' @param lambdapar positive scalar, the intensity paramter for the parent process
-#' @param name_par optional charachter, name of the parent
+#' @param lambdapar positive scalar, the intensity parameter for the parent process
+#' @param name_par optional character, name of the parent
 #' @param noff positive scalar, number of offsprings
-#' @param mu0vec numberic vector of positive numbers, vector of offspring densities
+#' @param mu0vec numeric vector of positive numbers, vector of offspring densities
 #' @param hvec numeric vector of positive numbers, vector of bandwidth parameters
+#' @param kern character, choice of kernel function. Permitted values are "Gaussian", "Uniform" or "Cauchy"
 #' @param names_off character vector, names of the offspring entities
 #' @param nxtra non-negative integer, number of unrelated entities
 #' @param lambdaxtra scalar or vector of positive numbers, intensities of the unrelated entities processes
@@ -21,7 +22,7 @@
 #' @export
 multiprocppp <- function(win,
                          lambdapar, name_par=NULL,
-                         noff,mu0vec,hvec,names_off=NULL,
+                         noff,mu0vec,hvec,kern="Gaussian",names_off=NULL,
                          nxtra=0,lambdaxtra,names_xtra=NULL){
   ## Initial Checks
   if(lambdapar <= 0 | length(lambdapar) != 1) stop("lambdapar must be a positive scalar")
@@ -53,6 +54,17 @@ multiprocppp <- function(win,
   if(length(hvec)==1) hvec <- rep(hvec,noff)
   if(nxtra > 0 & length(lambdaxtra)==1) lambdaxtra <- rep(lambdaxtra,nxtra)
 
+  if(!(kern %in% c("Gaussian","Cauchy","Uniform"))){stop("Only Gaussian, Uniform and Cauchy kernels are supported")}
+  if(kern == "Gaussian"){
+    rkern <- rkern.norm
+  }
+  if(kern == "Cauchy"){
+    rkern <- rkern.cauchy
+  }
+  if(kern == "Uniform"){
+    rkern <- rkern.unif
+  }
+
   #require('spatstat')
 
   ## Creating a factor of labels for marking
@@ -74,12 +86,16 @@ multiprocppp <- function(win,
     x0 <- rep.int(parentx,csize)
     y0 <- rep.int(parenty,csize)
 
-    dd <- matrix(rnorm(2*numoff,0,hvec[i]),ncol=2)
-    xy <- xy.coords(dd)
-    dx <- xy$x
-    dy <- xy$y
-    xoff <- x0 + dx
-    yoff <- y0 + dy
+    lll <- rkern(1,x0,y0,hvec[i])
+    xoff <- c(lll$Bx)
+    yoff <- c(lll$By)
+
+    ## dd <- matrix(rnorm(2*numoff,0,hvec[i]),ncol=2)
+    ## xy <- xy.coords(dd)
+    ## dx <- xy$x
+    ## dy <- xy$y
+    ## xoff <- x0 + dx
+    ## yoff <- y0 + dy
 
     retain <- spatstat.geom::inside.owin(xoff,yoff,win)
 

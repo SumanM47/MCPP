@@ -1,35 +1,3 @@
-#' @name check_within_window
-#' @title Internal function to check if a set of points is within a given window
-#'
-#' @param x numeric vector, x coordinates of the points
-#' @param y numeric vector, y coordinates of the points
-#' @param w owin class object, observation window
-#'
-#' @import sp
-#' @import spatstat.geom
-#'
-#' @return numeric vector of ones and zeros with
-#'  one meaning the point is within the window
-#' @noRd
-
-check_within_Window <- function(x,y,w){
-  if(w$type == "rectangle"){
-    xb <- w$xrange; xlb <- min(xb); xub <- max(xb)
-    yb <- w$yrange; ylb <- min(yb); yub <- max(yb)
-    out <- as.vector((x <= xub & x >= xlb)*(y <= yub & y >= ylb))
-  }
-  if(w$type=="polygonal"){
-    #require(sp)
-    polyx <- w$bdry[[1]]$x
-    polyy <- w$bdry[[1]]$y
-    #dimx <- dim(x)
-    ind <- sp::point.in.polygon(x,y,polyx,polyy)
-    out <- as.numeric(ind>0)
-  }
-  return(out)
-}
-
-
 #' @name getbignum2.norm
 #' @title Internal function to compute the sum of the log terms for Gaussian kernel
 #'

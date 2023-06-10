@@ -4,10 +4,10 @@
 \alias{summary.MCPP}
 \title{Summary function for MCPP class objects}
 \usage{
-summary.MCPP(x, digits = 3, ci = 0.95, ...)
+\method{summary}{MCPP}(object, digits = 3, ci = 0.95, ...)
 }
 \arguments{
-\item{x}{object of class MCPP}
+\item{object}{object of class MCPP}
 
 \item{digits}{number of digits to print}
 

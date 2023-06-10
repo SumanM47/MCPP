@@ -35,7 +35,6 @@
 #' @param path path to the storage file where the periodical results are to be saved
 #'
 #' @import spatstat.geom
-#' @import sp
 #' @import stats
 #' @import grDevices
 #'
@@ -175,7 +174,7 @@ fitMCPP <- function(obj,parent_genus,offspring_genus,
     hvec[ind] <- hs
     lll <- rkern(B,C_x,C_y,hs)
     Bigmat_x <- lll$Bx; Bigmat_y <- lll$By
-    Bignum1vec[ind] <- sum(check_within_Window(Bigmat_x,Bigmat_y,W))/B
+    Bignum1vec[ind] <- sum(spatstat.geom::inside.owin(c(Bigmat_x),c(Bigmat_y),W))/B
 
     Bignum2vec[ind] <- getbignum2(Y_x,Y_y,C_x,C_y,hs)
   }
@@ -238,7 +237,7 @@ fitMCPP <- function(obj,parent_genus,offspring_genus,
         pratio <- -0.5*((can_hs/hsd)^2 - (hs/hsd)^2)
         can_lll <- rkern(B,C_x,C_y,can_hs)
         Bigmat_x <- can_lll$Bx; Bigmat_y <- can_lll$By
-        can_Bignum1 <- sum(check_within_Window(Bigmat_x,Bigmat_y,W))/B
+        can_Bignum1 <- sum(spatstat.geom::inside.owin(c(Bigmat_x),c(Bigmat_y),W))/B
 
         can_Bignum2 <- getbignum2(Y_x,Y_y,C_x,C_y,can_hs)
 
@@ -300,7 +299,7 @@ fitMCPP <- function(obj,parent_genus,offspring_genus,
     barhs <- barh[j]
     barlll <- rkern(B,C_x,C_y,barhs)
     Bigmat_x <- barlll$Bx; Bigmat_y <- barlll$By
-    barBignum1vec[j] <- sum(check_within_Window(Bigmat_x,Bigmat_y,W))/B
+    barBignum1vec[j] <- sum(spatstat.geom::inside.owin(c(Bigmat_x),c(Bigmat_y),W))/B
 
     barBignum2vec[j] <- getbignum2(Y_x,Y_y,C_x,C_y,barhs)
   }

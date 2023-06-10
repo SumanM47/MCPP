@@ -11,6 +11,7 @@ multiprocppp(
   noff,
   mu0vec,
   hvec,
+  kern = "Gaussian",
   names_off = NULL,
   nxtra = 0,
   lambdaxtra,
@@ -20,15 +21,17 @@ multiprocppp(
 \arguments{
 \item{win}{owin class object, the observation window}
 
-\item{lambdapar}{positive scalar, the intensity paramter for the parent process}
+\item{lambdapar}{positive scalar, the intensity parameter for the parent process}
 
-\item{name_par}{optional charachter, name of the parent}
+\item{name_par}{optional character, name of the parent}
 
 \item{noff}{positive scalar, number of offsprings}
 
-\item{mu0vec}{numberic vector of positive numbers, vector of offspring densities}
+\item{mu0vec}{numeric vector of positive numbers, vector of offspring densities}
 
 \item{hvec}{numeric vector of positive numbers, vector of bandwidth parameters}
+
+\item{kern}{character, choice of kernel function. Permitted values are "Gaussian", "Uniform" or "Cauchy"}
 
 \item{names_off}{character vector, names of the offspring entities}
 

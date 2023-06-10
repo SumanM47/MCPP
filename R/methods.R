@@ -7,6 +7,8 @@
 #' @param ci level of confidence interval, between 0 and 1
 #' @param ... additional parameters supplied to the function
 #'
+#' @import stats
+#'
 #' @return prints outputs from the object
 #'
 #' @exportS3Method
@@ -88,62 +90,64 @@ print.MCPP <- function(x,digits=3,ci=0.95,...){
 
 #' @title Summary function for MCPP class objects
 #'
-#' @param x object of class MCPP
+#' @param object object of class MCPP
 #' @param digits number of digits to print
 #' @param ci level of confidence interval, between 0 and 1
 #' @param ... additional parameters supplied to the function
+#'
+#' @import stats
 #'
 #' @return Summary outputs from the object
 #'
 #' @exportS3Method
 
-summary.MCPP <- function(x,digits=3,ci=0.95,...){
+summary.MCPP <- function(object,digits=3,ci=0.95,...){
   la <- (1-ci)/2; ua <- 1-la
 
-  lambdaCest <- colMeans(x$lambdaC)
-  lambdaCmed <- apply(x$lambdaC,2,"median")
-  lambdaCsd <- apply(x$lambdaC,2,"sd")
-  lambdaCll <- apply(x$lambdaC,2,quantile,probs=la)
-  lambdaCul <- apply(x$lambdaC,2,quantile,probs=ua)
+  lambdaCest <- colMeans(object$lambdaC)
+  lambdaCmed <- apply(object$lambdaC,2,"median")
+  lambdaCsd <- apply(object$lambdaC,2,"sd")
+  lambdaCll <- apply(object$lambdaC,2,quantile,probs=la)
+  lambdaCul <- apply(object$lambdaC,2,quantile,probs=ua)
 
   lambdaCtab <- cbind(lambdaCest,lambdaCmed,lambdaCsd,lambdaCll,lambdaCul)
-  rownames(lambdaCtab) <- unique(x$setup$papir[,1])
+  rownames(lambdaCtab) <- unique(object$setup$papir[,1])
   colnames(lambdaCtab) <- c("EST","MED","SD","LL","UL")
 
   lambdaOtab <- NULL
-  if(!is.null(x$lambdaO)){
-    lambdaOest <- colMeans(x$lambdaO)
-    lambdaOmed <- apply(x$lambdaO,2,"median")
-    lambdaOsd <- apply(x$lambdaO,2,"sd")
-    lambdaOll <- apply(x$lambdaO,2,quantile,probs=la)
-    lambdaOul <- apply(x$lambdaO,2,quantile,probs=ua)
+  if(!is.null(object$lambdaO)){
+    lambdaOest <- colMeans(object$lambdaO)
+    lambdaOmed <- apply(object$lambdaO,2,"median")
+    lambdaOsd <- apply(object$lambdaO,2,"sd")
+    lambdaOll <- apply(object$lambdaO,2,quantile,probs=la)
+    lambdaOul <- apply(object$lambdaO,2,quantile,probs=ua)
 
     lambdaOtab <- cbind(lambdaOest,lambdaOmed,lambdaOsd,lambdaOll,lambdaOul)
-    rownames(lambdaOtab) <- x$setup$other
+    rownames(lambdaOtab) <- object$setup$other
     colnames(lambdaOtab) <- c("EST","MED","SD","LL","UL")
   }
 
-  mu0est <- colMeans(x$mu0)
-  mu0med <- apply(x$mu0,2,"median")
-  mu0sd <- apply(x$mu0,2,"sd")
-  mu0ll <- apply(x$mu0,2,quantile,probs=la)
-  mu0ul <- apply(x$mu0,2,quantile,probs=ua)
+  mu0est <- colMeans(object$mu0)
+  mu0med <- apply(object$mu0,2,"median")
+  mu0sd <- apply(object$mu0,2,"sd")
+  mu0ll <- apply(object$mu0,2,quantile,probs=la)
+  mu0ul <- apply(object$mu0,2,quantile,probs=ua)
 
   mu0tab <- cbind(mu0est,mu0med,mu0sd,mu0ll,mu0ul)
-  rownames(mu0tab) <- x$setup$popair[,2]
+  rownames(mu0tab) <- object$setup$popair[,2]
   colnames(mu0tab) <- c("EST","MED","SD","LL","UL")
 
-  hest <- colMeans(x$h)
-  hmed <- apply(x$h,2,"median")
-  hsd <- apply(x$h,2,"sd")
-  hll <- apply(x$h,2,quantile,probs=la)
-  hul <- apply(x$h,2,quantile,probs=ua)
+  hest <- colMeans(object$h)
+  hmed <- apply(object$h,2,"median")
+  hsd <- apply(object$h,2,"sd")
+  hll <- apply(object$h,2,quantile,probs=la)
+  hul <- apply(object$h,2,quantile,probs=ua)
 
   htab <- cbind(hest,hmed,hsd,hll,hul)
-  rownames(htab) <- x$setup$popair[,2]
+  rownames(htab) <- object$setup$popair[,2]
   colnames(htab) <- c("EST","MED","SD","LL","UL")
 
-  value <- list("lambdaC"=lambdaCtab,"alpha"=mu0tab,"h"=htab,"lambdaO"=lambdaOtab,"class"=x$class,"setup"=x$setup)
+  value <- list("lambdaC"=lambdaCtab,"alpha"=mu0tab,"h"=htab,"lambdaO"=lambdaOtab,"class"=object$class,"setup"=object$setup)
   class(value) <- "summ.MCPP"
   return(value)
 }
@@ -155,6 +159,8 @@ summary.MCPP <- function(x,digits=3,ci=0.95,...){
 #' @param x summary object of class MCPP
 #' @param digits number of digits to print
 #' @param ... additional parameters supplied to the function
+#'
+#' @import stats
 #'
 #' @return prints outputs from the summary object
 #'

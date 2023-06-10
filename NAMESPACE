@@ -2,10 +2,10 @@
 
 S3method(print,MCPP)
 S3method(print,summ.MCPP)
+S3method(summary,MCPP)
 export(fitMCPP)
 export(multiprocppp)
 import(grDevices)
-import(sp)
 import(spatstat.geom)
 import(spatstat.random)
 import(stats)
