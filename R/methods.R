@@ -180,7 +180,7 @@ print.summ.MCPP <- function(x,digits=3,...){
   print(round(x$lambdaC,digits))
 
   cat("\nOffspring Density \n")
-  print(round(x$mu0,digits))
+  print(round(x$alpha,digits))
 
   cat("\nBandwidth \n")
   print(round(x$h,digits))
