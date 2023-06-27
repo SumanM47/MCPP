@@ -62,17 +62,26 @@ getbignum2.unif <- function(Y_x,Y_y,C_x,C_y,h){
 #' @param Y_y numeric vector, y coordinates of the offspring process
 #' @param C_x numeric vector, x coordinates of the parent process
 #' @param C_y numeric vector, y coordinates of the parent process
+#' @param kern character string, specify the kernel to use. Can be "Gaussian", "Uniform" or "Cauchy"
 #'
 #' @useDynLib MCPP, .registration=TRUE
 #'
 #' @return positive scalar for initial value of h
 #' @noRd
 
-gethpars <- function(Y_x,Y_y,C_x,C_y){
+gethpars <- function(Y_x,Y_y,C_x,C_y,kern){
   hsamp <- .Call("gethsamp",as.numeric(Y_x),as.numeric(Y_y),as.numeric(C_x),as.numeric(C_y))
-  hbar <- mean(hsamp)
+  if(kern=="Gaussian"){
+    h2use <- mean(hsamp)*sqrt(2/pi)
+  }
+  if(kern=="Uniform"){
+    h2use <- max(hsamp)*(1+(1/length(Y_x)))
+  }
+  if(kern=="Cauchy"){
+    h2use <- median(hsamp)/sqrt(5)
+  }
 
-  return(hbar)
+  return(h2use)
 }
 
 
@@ -131,7 +140,7 @@ rkern.norm <- function(B,Cx,Cy,h){
 
 rkern.cauchy <- function(B,Cx,Cy,h){
   nCs <- length(Cx)
-  Z <- sqrt(matrix(rchisq(nCs*B),nCs,B))
+  Z <- sqrt(matrix(rchisq(nCs*B,df=1),nCs,B))
   Bx <- Cx + (h/Z)*matrix(rnorm(nCs*B),nCs,B)
   By <- Cy + (h/Z)*matrix(rnorm(nCs*B),nCs,B)
   out <- list("Bx"=Bx,"By"=By)

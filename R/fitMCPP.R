@@ -167,7 +167,7 @@ fitMCPP <- function(obj,parent_genus,offspring_genus,
   for(ind in 1:not){
     Y_x <- Ypart_x[[ind]]; Y_y <- Ypart_y[[ind]]; n_Ys <- n_Ypart[ind]
     C_x <- Cpart_x[[ind]]; C_y <- Cpart_y[[ind]]; n_Cs <- n_Cpart[ind]
-    if(is.null(startValues$h)){hs <- gethpars(Y_x,Y_y,C_x,C_y)}else{hs <- hvec[ind]}
+    if(is.null(startValues$h)){hs <- gethpars(Y_x,Y_y,C_x,C_y,kern)}else{hs <- hvec[ind]}
     if(jitter){
       hs <- jitter(hs)
     }
@@ -241,6 +241,7 @@ fitMCPP <- function(obj,parent_genus,offspring_genus,
 
         can_Bignum2 <- getbignum2(Y_x,Y_y,C_x,C_y,can_hs)
 
+        if(is.finite(can_Bignum2)){
         can_ll.lhs <- -mu0vec[j]*can_Bignum1 + can_Bignum2
 
         a_lhs <- can_ll.lhs - ll.lhs + pratio
@@ -249,6 +250,7 @@ fitMCPP <- function(obj,parent_genus,offspring_genus,
           Bignum2vec[j] <- can_Bignum2
           hvec[j] <- can_hs
           ll.lh[j] <- can_ll.lhs
+        }
         }
       }
     }
