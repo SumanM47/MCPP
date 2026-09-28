@@ -23,9 +23,9 @@ print.MCPP <- function(x,digits=3,ci=0.95,...){
   lambdaCll <- apply(x$lambdaC,2,quantile,probs=la)
   lambdaCul <- apply(x$lambdaC,2,quantile,probs=ua)
 
-  lambdaCtab <- cbind(lambdaCest,lambdaCmed,lambdaCsd,lambdaCll,lambdaCul)
-  rownames(lambdaCtab) <- unique(x$setup$papir[,1])
-  colnames(lambdaCtab) <- c("EST","MED","SD","LL","UL")
+  lambdaCtab <- cbind(lambdaCest,lambdaCsd,lambdaCll,lambdaCmed,lambdaCul)
+  rownames(lambdaCtab) <- x$setup$uparent
+  colnames(lambdaCtab) <- c("Mean","SD",paste(100*la,"%",sep=""),"50%",paste(100*ua,"%",sep=""))
 
 
   if(!is.null(x$lambdaO)){
@@ -35,9 +35,9 @@ print.MCPP <- function(x,digits=3,ci=0.95,...){
   lambdaOll <- apply(x$lambdaO,2,quantile,probs=la)
   lambdaOul <- apply(x$lambdaO,2,quantile,probs=ua)
 
-  lambdaOtab <- cbind(lambdaOest,lambdaOmed,lambdaOsd,lambdaOll,lambdaOul)
+  lambdaOtab <- cbind(lambdaOest,lambdaOsd,lambdaOll,lambdaOmed,lambdaOul)
   rownames(lambdaOtab) <- x$setup$other
-  colnames(lambdaOtab) <- c("EST","MED","SD","LL","UL")
+  colnames(lambdaOtab) <- c("Mean","SD",paste(100*la,"%",sep=""),"50%",paste(100*ua,"%",sep=""))
   }
 
   mu0est <- colMeans(x$mu0)
@@ -46,9 +46,9 @@ print.MCPP <- function(x,digits=3,ci=0.95,...){
   mu0ll <- apply(x$mu0,2,quantile,probs=la)
   mu0ul <- apply(x$mu0,2,quantile,probs=ua)
 
-  mu0tab <- cbind(mu0est,mu0med,mu0sd,mu0ll,mu0ul)
+  mu0tab <- cbind(mu0est,mu0med,mu0sd,mu0ll,mu0med,mu0ul)
   rownames(mu0tab) <- x$setup$popair[,2]
-  colnames(mu0tab) <- c("EST","MED","SD","LL","UL")
+  colnames(mu0tab) <- c("Mean","SD",paste(100*la,"%",sep=""),"50%",paste(100*ua,"%",sep=""))
 
   hest <- colMeans(x$h)
   hmed <- apply(x$h,2,"median")
@@ -56,9 +56,9 @@ print.MCPP <- function(x,digits=3,ci=0.95,...){
   hll <- apply(x$h,2,quantile,probs=la)
   hul <- apply(x$h,2,quantile,probs=ua)
 
-  htab <- cbind(hest,hmed,hsd,hll,hul)
+  htab <- cbind(hest,hsd,hll,hmed,hul)
   rownames(htab) <- x$setup$popair[,2]
-  colnames(htab) <- c("EST","MED","SD","LL","UL")
+  colnames(htab) <- c("Mean","SD",paste(100*la,"%",sep=""),"50%",paste(100*ua,"%",sep=""))
 
   cat("\nAnalysis of Multivariate Cluster Point Process \n")
   cat("Number of scans = ",x$setup$nreps,"\n",sep="")
@@ -66,22 +66,25 @@ print.MCPP <- function(x,digits=3,ci=0.95,...){
   cat("Thinning interval =",x$setup$thin,"\n",sep="")
   cat("Number of posterior samples = ",nrow(x$lambdaC),"\n",sep="")
 
-  cat("\nParent-Offspring Pairs in analysis: \n")
+  cat("Parent-Offspring Pairs in analysis: \n")
   print(x$setup$popair,quote=F)
 
-  cat("\nParent Intensity \n")
+  cat("Parent Intensity \n")
   print(round(lambdaCtab,digits))
 
-  cat("\nOffspring Density \n")
+  cat("Offspring Density \n")
   print(round(mu0tab,digits))
 
-  cat("\nBandwidth \n")
+  cat("Bandwidth \n")
   print(round(htab,digits))
 
-  cat("\n Other Taxa (if present) \n")
+  cat("Other Taxa (if present) \n")
   if(!is.null(x$lambdaO)){
     print(round(lambdaOtab,digits))
   }
+
+  cat("DIC \n")
+  print(round(x$DIC,digits))
 
   invisible()
 }
@@ -110,9 +113,9 @@ summary.MCPP <- function(object,digits=3,ci=0.95,...){
   lambdaCll <- apply(object$lambdaC,2,quantile,probs=la)
   lambdaCul <- apply(object$lambdaC,2,quantile,probs=ua)
 
-  lambdaCtab <- cbind(lambdaCest,lambdaCmed,lambdaCsd,lambdaCll,lambdaCul)
-  rownames(lambdaCtab) <- unique(object$setup$papir[,1])
-  colnames(lambdaCtab) <- c("EST","MED","SD","LL","UL")
+  lambdaCtab <- cbind(lambdaCest,lambdaCsd,lambdaCll,lambdaCmed,lambdaCul)
+  rownames(lambdaCtab) <- object$setup$uparent
+  colnames(lambdaCtab) <- c("Mean","SD",paste(100*la,"%",sep=""),"50%",paste(100*ua,"%",sep=""))
 
   lambdaOtab <- NULL
   if(!is.null(object$lambdaO)){
@@ -122,9 +125,9 @@ summary.MCPP <- function(object,digits=3,ci=0.95,...){
     lambdaOll <- apply(object$lambdaO,2,quantile,probs=la)
     lambdaOul <- apply(object$lambdaO,2,quantile,probs=ua)
 
-    lambdaOtab <- cbind(lambdaOest,lambdaOmed,lambdaOsd,lambdaOll,lambdaOul)
+    lambdaOtab <- cbind(lambdaOest,lambdaOmed,lambdaOsd,lambdaOll,lambdaOmed,lambdaOul)
     rownames(lambdaOtab) <- object$setup$other
-    colnames(lambdaOtab) <- c("EST","MED","SD","LL","UL")
+    colnames(lambdaOtab) <- c("Mean","SD",paste(100*la,"%",sep=""),"50%",paste(100*ua,"%",sep=""))
   }
 
   mu0est <- colMeans(object$mu0)
@@ -133,9 +136,9 @@ summary.MCPP <- function(object,digits=3,ci=0.95,...){
   mu0ll <- apply(object$mu0,2,quantile,probs=la)
   mu0ul <- apply(object$mu0,2,quantile,probs=ua)
 
-  mu0tab <- cbind(mu0est,mu0med,mu0sd,mu0ll,mu0ul)
+  mu0tab <- cbind(mu0est,mu0med,mu0sd,mu0ll,mu0med,mu0ul)
   rownames(mu0tab) <- object$setup$popair[,2]
-  colnames(mu0tab) <- c("EST","MED","SD","LL","UL")
+  colnames(mu0tab) <- c("Mean","SD",paste(100*la,"%",sep=""),"50%",paste(100*ua,"%",sep=""))
 
   hest <- colMeans(object$h)
   hmed <- apply(object$h,2,"median")
@@ -143,16 +146,16 @@ summary.MCPP <- function(object,digits=3,ci=0.95,...){
   hll <- apply(object$h,2,quantile,probs=la)
   hul <- apply(object$h,2,quantile,probs=ua)
 
-  htab <- cbind(hest,hmed,hsd,hll,hul)
+  htab <- cbind(hest,hsd,hll,hmed,hul)
   rownames(htab) <- object$setup$popair[,2]
-  colnames(htab) <- c("EST","MED","SD","LL","UL")
+  colnames(htab) <- c("Mean","SD",paste(100*la,"%",sep=""),"50%",paste(100*ua,"%",sep=""))
 
-  value <- list("lambdaC"=lambdaCtab,"alpha"=mu0tab,"h"=htab,"lambdaO"=lambdaOtab,"class"=object$class,"setup"=object$setup)
+  value <- list("lambdaC"=lambdaCtab,"alpha"=mu0tab,"h"=htab,"lambdaO"=lambdaOtab, "DIC"=object$DIC,"class"=object$class,"setup"=object$setup)
   class(value) <- "summ.MCPP"
   return(value)
 }
 
-## PRINT SUMMARY METHOD ###
+### PRINT SUMMARY METHOD ###
 
 #' @title Print function for summary of MCPP class objects
 #'
@@ -167,28 +170,115 @@ summary.MCPP <- function(object,digits=3,ci=0.95,...){
 #' @exportS3Method
 
 print.summ.MCPP <- function(x,digits=3,...){
-  cat("\nAnalysis of Multivariate Cluster Point Process \n")
+  cat("Summary of MCPP object",x,"\n",sep=" ")
   cat("Number of scans = ",x$setup$nreps,"\n",sep="")
   cat("Initial Burn-in samples = ",x$setup$burn,"\n",sep="")
   cat("Thinning interval =",x$setup$thin,"\n",sep="")
   cat("Number of posterior samples = ",nrow(x$lambdaC),"\n",sep="")
 
-  cat("\nParent-Offspring Pairs in analysis: \n")
+  cat("DIC = ",x$DIC,"\n",sep="")
+
+  cat("Parent-Offspring Pairs in analysis: \n")
   print(x$setup$popair,quote=F)
 
-  cat("\nParent Intensity \n")
+  cat("Parent Intensity \n")
   print(round(x$lambdaC,digits))
 
-  cat("\nOffspring Density \n")
+  cat("Offspring Density \n")
   print(round(x$alpha,digits))
 
-  cat("\nBandwidth \n")
+  cat("Bandwidth \n")
   print(round(x$h,digits))
 
-  cat("\n Other Taxa (if present) \n")
+  cat("Other Taxa (if present) \n")
   if(!is.null(x$lambdaO)){
     print(round(x$lambdaO,digits))
   }
+
+  invisible()
+}
+
+
+### PLOT METHOD ###
+
+plot.MCPP(x, trace=TRUE, density=TRUE){
+  oldpar <- par(no.readonly = TRUE)
+
+  on.exit(par(old.par))
+
+  nsamp <- nrow(x$lambdaC)
+  nparC <- ncol(x$lambdaC)
+  nparmu0 <- ncol(x$mu0)
+  nparh <- ncol(x$h)
+  nparO <- 0
+  if(!is.null(x$lambdaO)){nparO <- ncol(x$lambdaO)}
+
+  totpar <- nparC + nparmu0 + nparh + nparO
+
+  ylim <- c(0,0)
+
+  par(mfrow=c(nparC,2),ask=TRUE)
+  for(i in 1:nparC){
+    obj2use <- x$lambdaC[,i]
+    hyp <- x$setup$hyeprParams$lambda
+    ddpost <- density(obj2use)
+    xvals <- sort(obj2use)
+    ddpr <- dgamma(xvals,shape=hyp[1],rate=hyp[2])
+    miny <- min(min(ddpost$y),min(ddpr))
+    maxy <- max(max(ddpost$y),max(ddpr))
+    plot(obj2use,xlab="index",ylab="",main=paste("lambdaC_",i,sep=""))
+    plot(ddpost,ylim=c(miny-0.05,maxy + 0.05),xlab="",ylab="density",main=paste("Density of lambdaC_",i,sep=""))
+    lines(xvals,ddpr,col="grey",lty=2)
+    legend("topright",c("prior","posterior"),col=c("grey","black"),lty=1:2,cex=0.6)
+  }
+
+  par(mfrow=c(nparmu0,2),ask=TRUE)
+  for(i in 1:nparmu0){
+    obj2use <- x$lambdamu0[,i]
+    hyp <- x$setup$hyeprParams$alpha
+    ddpost <- density(obj2use)
+    xvals <- sort(obj2use)
+    ddpr <- dgamma(xvals,shape=hyp[1],rate=hyp[2])
+    miny <- min(min(ddpost$y),min(ddpr))
+    maxy <- max(max(ddpost$y),max(ddpr))
+    plot(obj2use,xlab="index",ylab="",main=paste("alpha_",i,sep=""))
+    plot(ddpost,ylim=c(miny-0.05,maxy + 0.05),xlab="",ylab="density",main=paste("Density of alpha_",i,sep=""))
+    lines(xvals,ddpr,col="grey",lty=2)
+    legend("topright",c("prior","posterior"),col=c("grey","black"),lty=1:2,cex=0.6)
+  }
+
+  par(mfrow=c(nparh,2),ask=TRUE)
+  for(i in 1:nparh){
+    obj2use <- x$h[,i]
+    hyp <- x$setup$hyeprParams$h
+    ddpost <- density(obj2use)
+    xvals <- sort(obj2use)
+    ddpr <- 2*dnorm(xvals,mean=0,sd=hyp)
+    miny <- min(min(ddpost$y),min(ddpr))
+    maxy <- max(max(ddpost$y),max(ddpr))
+    plot(obj2use,xlab="index",ylab="",main=paste("h_",i,sep=""))
+    plot(ddpost,ylim=c(miny-0.05,maxy + 0.05),xlab="",ylab="density",main=paste("Density of h_",i,sep=""))
+    lines(xvals,ddpr,col="grey",lty=2)
+    legend("topright",c("prior","posterior"),col=c("grey","black"),lty=1:2,cex=0.6)
+  }
+
+  if(nparO > 0){
+    par(mfrow=c(nparO,2),ask=TRUE)
+    for(i in 1:nparO){
+      obj2use <- x$lambdaO[,i]
+      hyp <- x$setup$hyeprParams$lambdaO
+      ddpost <- density(obj2use)
+      xvals <- sort(obj2use)
+      ddpr <- dgamma(xvals,shape=hyp[1],rate=hyp[2])
+      miny <- min(min(ddpost$y),min(ddpr))
+      maxy <- max(max(ddpost$y),max(ddpr))
+      plot(obj2use,xlab="index",ylab="",main=paste("lambdaO_",i,sep=""))
+      plot(ddpost,ylim=c(miny-0.05,maxy + 0.05),xlab="",ylab="density",main=paste("Density of lambdaO_",i,sep=""))
+      lines(xvals,ddpr,col="grey",lty=2)
+      legend("topright",c("prior","posterior"),col=c("grey","black"),lty=1:2,cex=0.6)
+    }
+  }
+
 
   invisible()
 }

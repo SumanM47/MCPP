@@ -312,10 +312,11 @@ fitMCPP <- function(obj,parent_genus,offspring_genus,
   setup$burn <- burn
   setup$thin <- thin
   setup$popair <- cbind(parent_genus,offspring_genus)
+  setup$uparent <- upno
   setup$others <- NULL
   if(nxt>0){setup$others <- xtra_genus; barlambdaO <- colMeans(keep.lambdaO); dtheta <- dtheta + 2*sum((W_area + bo)*barlambdaO - (ao + n_Opart)*log(barlambdaO))}
   DIC <- 2*dbar - dtheta
-  lst <- list("lambdaC"=keep.lambdaC,"mu0"=keep.mu0,"h"=keep.h,"lambdaO"=keep.lambdaO,"setup" = setup, "DIC" = DIC)
+  lst <- list("lambdaC"=keep.lambdaC,"mu0"=keep.mu0,"h"=keep.h,"lambdaO"=keep.lambdaO,"setup" = setup, "DIC" = DIC, "hyperParams" = hyperParams)
   class(lst) <- "MCPP"
   return(lst)
 }
