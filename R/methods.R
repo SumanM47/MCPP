@@ -201,7 +201,20 @@ print.summ.MCPP <- function(x,digits=3,...){
 
 ### PLOT METHOD ###
 
-plot.MCPP(x, trace=TRUE, density=TRUE){
+#' @title Plot function for MCPP class objects
+#'
+#' @param x object of class MCPP
+#' @param trace logical, whether to create trace plots
+#' @param density logical, whether to create density plots
+#'
+#' @import stats
+#' @import graphics
+#'
+#' @return plots trace plots and density plots for parameters of the MCPP object
+#'
+#' @exportS3Method
+
+plot.MCPP <- function(x, trace=TRUE, density=TRUE){
   oldpar <- par(no.readonly = TRUE)
 
   on.exit(par(old.par))

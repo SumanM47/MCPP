@@ -6,26 +6,30 @@
 \usage{
 multiprocppp(
   win,
-  lambdapar,
-  name_par = NULL,
+  npar,
   noff,
+  nxtra = 0,
+  lambdapar,
   mu0vec,
   hvec,
   kern = "Gaussian",
-  names_off = NULL,
-  nxtra = 0,
   lambdaxtra,
+  paroffrel,
+  names_par = NULL,
+  names_off = NULL,
   names_xtra = NULL
 )
 }
 \arguments{
 \item{win}{owin class object, the observation window}
 
-\item{lambdapar}{positive scalar, the intensity parameter for the parent process}
+\item{npar}{number of parent taxa which are not offsprings themselves}
 
-\item{name_par}{optional character, name of the parent}
+\item{noff}{number of offspring taxa. This includes taxa which may be parents to other offspring taxa}
 
-\item{noff}{positive scalar, number of offsprings}
+\item{nxtra}{number of unrelated taxa. Defaults to 0}
+
+\item{lambdapar}{intensity parameter for the parent processes. Must be a positive scalar or a positive vector of size npar}
 
 \item{mu0vec}{numeric vector of positive numbers, vector of offspring densities}
 
@@ -33,13 +37,15 @@ multiprocppp(
 
 \item{kern}{character, choice of kernel function. Permitted values are "Gaussian", "Uniform" or "Cauchy"}
 
-\item{names_off}{character vector, names of the offspring entities}
-
-\item{nxtra}{non-negative integer, number of unrelated entities}
-
 \item{lambdaxtra}{scalar or vector of positive numbers, intensities of the unrelated entities processes}
 
+\item{paroffrel}{a character matrix of size noff x 2. The second column denotes the offspring and the first column denotes its parent.}
+
+\item{names_off}{character vector, names of the offspring entities}
+
 \item{names_xtra}{scalar or vector of characters, names of the unrelated entities}
+
+\item{name_par}{optional character, name of the parent}
 }
 \value{
 object of class ppp
